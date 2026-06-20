@@ -1,0 +1,36 @@
+let oldCount = 0;
+
+async function checkMemberIncrease() {
+  const res = await fetch(
+    "https://api.chess.com/pub/club/blunder-master-vn/members"
+  );
+
+  const data = await res.json();
+
+  // Tổng member hiện tại
+  const currentCount =
+    data.weekly.length +
+    data.monthly.length +
+    data.all_time.length;
+
+  // Lần đầu chạy
+  if (oldCount === 0) {
+    oldCount = currentCount;
+    console.log("Member hiện tại:", currentCount);
+    return;
+  }
+
+  // Số member tăng
+  const increased = currentCount - oldCount;
+
+  console.log("Tăng trong tuần:", increased);
+
+  // cập nhật số cũ
+  oldCount = currentCount;
+}
+
+// kiểm tra mỗi tuần
+setInterval(checkMemberIncrease, 7 * 24 * 60 * 60 * 1000);
+
+// chạy ngay lần đầu
+checkMemberIncrease();
