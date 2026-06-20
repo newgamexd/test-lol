@@ -1,36 +1,31 @@
-let oldCount = 0;
-
-async function checkMemberIncrease() {
+<script>
+async function getClubMembers() {
   const res = await fetch(
-    "https://api.chess.com/pub/club/blunder-master-vn/members"
+    "https://api.chess.com/pub/club/blunder-master-vn"
   );
 
   const data = await res.json();
 
-  // Tổng member hiện tại
-  const currentCount =
-    data.weekly.length +
-    data.monthly.length +
-    data.all_time.length;
-
-  // Lần đầu chạy
-  if (oldCount === 0) {
-    oldCount = currentCount;
-    console.log("Member hiện tại:", currentCount);
-    return;
-  }
-
-  // Số member tăng
-  const increased = currentCount - oldCount;
-
-  console.log("Tăng trong tuần:", increased);
-
-  // cập nhật số cũ
-  oldCount = currentCount;
+  return data.members_count;
 }
 
-// kiểm tra mỗi tuần
-setInterval(checkMemberIncrease, 7 * 24 * 60 * 60 * 1000);
+async function checkWeeklyIncrease() {
+  const current = await getClubMembers();
 
-// chạy ngay lần đầu
-checkMemberIncrease();
+  // lấy dữ liệu tuần trước đã lưu
+  const old = Number(localStorage.getItem("oldMembers")) || current;
+
+  // tính số tăng
+  const increased = current - old;
+
+  console.log("Hiện tại:", current);
+  console.log("Tăng trong 1 tuần:", increased);
+
+  // lưu lại sau 1 tuần
+  setTimeout(() => {
+    localStorage.setItem("oldMembers", current);
+  }, 7 * 24 * 60 * 60 * 1000);
+}
+
+checkWeeklyIncrease();
+</script>
